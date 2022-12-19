@@ -11,7 +11,7 @@ class Product(models.Model):
 
 class Customer(models.Model):
     name = models.CharField(max_length=200)
-    address = models.TextField()
+    pin_code = models.IntegerField(default=530049)
 
     def __str__(self) -> str:
         return self.name

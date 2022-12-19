@@ -4,7 +4,7 @@ from .models import Transaction
 class TransactionSerializer(serializers.ModelSerializer):
     total_amount = serializers.SerializerMethodField()
     product_id_quantity = serializers.SerializerMethodField()
-    address =serializers.SerializerMethodField()
+    pincode = serializers.SerializerMethodField()
 
     class Meta:
         model = Transaction
@@ -16,5 +16,5 @@ class TransactionSerializer(serializers.ModelSerializer):
     def get_product_id_quantity(self, obj):
         return obj.quantity_list()
 
-    def get_address(self,obj):
-        return obj.customer.address
+    def get_pin_code(self,obj):
+        return obj.customer.pin_code
