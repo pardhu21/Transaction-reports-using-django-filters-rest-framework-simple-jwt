@@ -4,11 +4,11 @@ from .models import Transaction
 class TransactionSerializer(serializers.ModelSerializer):
     total_amount = serializers.SerializerMethodField()
     product_id_quantity = serializers.SerializerMethodField()
-    pincode = serializers.SerializerMethodField()
+    pin_code = serializers.SerializerMethodField()
 
     class Meta:
         model = Transaction
-        fields = ['id', 'customer', 'merchant', 'product_id_quantity', 'total_amount', 'address', 'timestamp']
+        fields = ['id', 'customer', 'merchant', 'product_id_quantity', 'total_amount', 'pin_code', 'timestamp']
 
     def get_total_amount(self, obj):
         return obj.total_amount()
