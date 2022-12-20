@@ -1,13 +1,16 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import *
+from .filters import TransactioFilter
 from .serializer import TransactionSerializer
 from django.contrib.auth.models import User
 # Create your views here.
 
 @api_view(['GET'])
-def transacions(request):
+def transactions(request):
     transactions = Transaction.objects.all()
     serializer = TransactionSerializer(transactions, many = True)
     return Response(serializer.data)
@@ -31,3 +34,9 @@ def customer_transactions(request, customer_id):
     transacions = customer.transaction_set.all()
     serializer = TransactionSerializer(transacions, many = True)
     return Response(serializer.data)
+
+class TransactionList(ListAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TransactioFilter
