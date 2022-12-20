@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Transaction
+from .models import Transaction, Customer
 
 class TransactionSerializer(serializers.ModelSerializer):
     product_id_quantity = serializers.SerializerMethodField()
@@ -14,3 +14,8 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     def get_pin_code(self,obj):
         return obj.customer.pin_code
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = '__all__'

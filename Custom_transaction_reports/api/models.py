@@ -29,6 +29,7 @@ class Transaction(models.Model):
     def __str__(self) -> str:
         return f'ID:{self.id} Transaction between {self.customer} and {self.merchant}'
 
+    #returns a zipped list containing porduct id and its quantity of a tranaction 
     def quantity_list(self):
         products = self.products.all()
         quantites = []
@@ -37,17 +38,21 @@ class Transaction(models.Model):
         products_id = [product.id for product in products]
         return list(zip(products_id,quantites))
 
+
+#Many to Many field relationship table containing an extra field for product quantity
 class TransactionProduct(models.Model):
     transaction =models.ForeignKey(Transaction, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
 
+    #Restricts multiple entries on one product in same transaction
     class Meta:
         unique_together = ('transaction', 'product')
 
     def __str__(self) -> str:
         return f'Product {self.product} of quantity {self.quantity}'
 
+#Function to update total_amount field by multiplying number of products and their cost
 def tranaction_product_update(sender, instance, *args, **kwargs):
     transaction = instance.transaction
     products = instance.transaction.products.all()
@@ -58,5 +63,6 @@ def tranaction_product_update(sender, instance, *args, **kwargs):
     transaction.total_amount = total
     transaction.save()
 
+#Signals: Calls the aboe function whenever TransactionProduct table is updated, saved or a row is delete from it 
 post_save.connect(tranaction_product_update, sender=TransactionProduct)
 post_delete.connect(tranaction_product_update, sender=TransactionProduct)  
