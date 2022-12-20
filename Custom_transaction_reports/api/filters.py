@@ -6,7 +6,6 @@ class TransactioFilter(django_filters.FilterSet):
         model = Transaction
         fields = {
             'total_amount': ['lt', 'gt'],
-            'products__name' : ['icontains'],
             'customer__name' : ['icontains'],
             'timestamp' : ['lt', 'gt']
         }
