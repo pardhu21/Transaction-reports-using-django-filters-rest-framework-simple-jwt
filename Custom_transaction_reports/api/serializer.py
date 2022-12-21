@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Transaction, Customer
+from django.contrib.auth.models import User
 
 class TransactionSerializer(serializers.ModelSerializer):
     product_id_quantity = serializers.SerializerMethodField()
@@ -19,3 +20,13 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
