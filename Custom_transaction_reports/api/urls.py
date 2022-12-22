@@ -8,6 +8,7 @@ urlpatterns = [
     path('transaction/customer/<int:customer_id>', customer_transactions, name='customer-transactions'),
     path('customer', customers, name='customers'),
     path('customer/<int:customer_id>',customer, name='customer'),
-    path('register', RegisterAPIView.as_view(), name='register'),
-    path('login', LoginAPIView.as_view(), name='login')
+    path('register', RegisterAPIView.as_view(), name='api-register'),
+    path('login', LoginAPIView.as_view(), name='api-login'),
+    path('bogus', bogus)
 ]
