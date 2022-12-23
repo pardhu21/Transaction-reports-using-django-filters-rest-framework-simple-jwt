@@ -63,15 +63,17 @@ def register_user(request):
 def dashboard(request):
     url = 'http://127.0.0.1:8000/api/transaction'
     data = requests.get(url = url, headers={'authorization':f'Bearer {Tokens.token}', 'content-type': 'application/json'})
+    print('here')
     if data.status_code == 200:
         return render(request, 'auditor/base-dashboard.html', {'data' : data.json()})
     if data.status_code == 401:
-       get_new_token()
-       return redirect('dashboard')
+        print('then here')
+        get_new_token()
+        return redirect('dashboard')
 
 def get_new_token():
     url = 'http://127.0.0.1:8000/api/token/refresh/'
     data = requests.post(url = url, data = {"refresh": Tokens.refresh}).json()  
-    Tokens.token = ['access']
+    Tokens.token = data['access']
     
                                         
