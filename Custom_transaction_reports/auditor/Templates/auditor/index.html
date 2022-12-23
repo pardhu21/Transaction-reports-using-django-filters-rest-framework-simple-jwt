@@ -35,9 +35,15 @@
               <li class="nav-item px-4">
                 <a class="nav-link" href="#featured-3"><p class="fs-4 mt-2">Features</p></a>
               </li>
+              {% if not request.user.is_anonymous %}
+              <li class="nav-item px-4">
+                <a class="nav-link" href="{% url 'login' %}"><p class="fs-4 mt-2">Welcome {{request.user}}</p></a>
+              </li>
+              {% else %}
               <li class="nav-item px-4">
                 <a class="nav-link {% block loginactive %}{% endblock loginactive %}" href="{% url 'login' %}"><p class="fs-4 mt-2">Login</p></a>
               </li>
+              {% endif %}
             </ul>
           </div>
         </div>
