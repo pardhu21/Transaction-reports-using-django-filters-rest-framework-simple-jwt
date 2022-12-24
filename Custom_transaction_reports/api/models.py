@@ -11,6 +11,17 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.name
+class Filter(models.Model):
+    name = models.CharField(max_length=100)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    total_amount_lower_than = models.IntegerField(blank=True, null=True)
+    total_amount_greater_than = models.IntegerField(blank=True, null=True)
+    customer_name = models.CharField(max_length=100,blank=True,null=True)
+    timestamp_lower_than = models.IntegerField(blank=True, null=True)
+    timestamp_greater_than = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
 class Customer(models.Model):
     name = models.CharField(max_length=200)

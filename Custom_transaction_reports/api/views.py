@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView, GenericAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import *
 from .filters import TransactioFilter
-from .serializer import TransactionSerializer, CustomerSerializer, RegisterSerializer, LoginSerializer
+from .serializer import TransactionSerializer, CustomerSerializer, RegisterSerializer, LoginSerializer, ProductSerializer, FilterSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
@@ -19,7 +19,7 @@ class TransactionList(ListAPIView):
     serializer_class = TransactionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = TransactioFilter
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -48,7 +48,7 @@ def customer_transactions(request, customer_id):
 @permission_classes([IsAuthenticated])
 def customers(request):
     customers = Customer.objects.all()
-    serializer = CustomerSerializer(customers)
+    serializer = CustomerSerializer(customers, many = True)
     return Response(serializer.data)
 
 @api_view(['GET'])
@@ -57,6 +57,29 @@ def customer(request, customer_id):
     customer = Customer.objects.get(pk = customer_id)
     serializer = CustomerSerializer(customer)
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def products(request):
+    products = Product.objects.all()
+    serializer = ProductSerializer(products, many = True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def product(request, product_id):
+    product = Product.objects.get(pk = product_id)
+    serializer = ProductSerializer(product)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+#@permission_classes([IsAuthenticated])
+def filter(request, username):
+    user = User.objects.get(username = username)
+    filters = user.filter_set.all()
+    serializer = FilterSerializer(filters, many = True)
+    return Response(serializer.data)
+
 
 class RegisterAPIView(GenericAPIView):
     serializer_class = RegisterSerializer

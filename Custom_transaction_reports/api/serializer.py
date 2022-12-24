@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Transaction, Customer, TransactionProduct
+from .models import Transaction, Customer, TransactionProduct, Product, Filter
 from django.contrib.auth.models import User
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -38,6 +38,11 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = Customer
         fields = '__all__'
 
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -47,3 +52,8 @@ class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'password']
+
+class FilterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Filter
+        fields = '__all__'
