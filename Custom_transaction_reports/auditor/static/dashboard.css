@@ -91,3 +91,7 @@ table {
   vertical-align: top;
   border-color: #dee2e6;
 }
+
+#content{
+  margin-left: 10%;
+}

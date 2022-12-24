@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0"> 
-    <title>Auditor | {% block title %}{% endblock title %}</title>
+    <title>Dashboard | {% block title %}{% endblock title %}</title>
     {% load static %}
     <!-- Bootstrap core CSS -->
 <link href="https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -52,42 +52,33 @@
       <div class="position-sticky pt-3">
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">
+            <a class="nav-link {% block dashboardactive %}{% endblock dashboardactive %}" aria-current="page" href="{% url 'dashboard' %}">
               <span data-feather="home"></span>
               Dashboard
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {% block transactionsactive %}{% endblock transactionsactive %}" href="#">
               <span data-feather="file"></span>
               Transactions
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {% block productsactive %}{% endblock productsactive %}" href="#">
               <span data-feather="shopping-cart"></span>
               Products
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {% block customersactive %}{% endblock customersactive %}" href="#">
               <span data-feather="users"></span>
               Customers
             </a>
           </li>
-        </ul>
-
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>Saved filters</span>
-          <a class="link-secondary" href="#" aria-label="Add a new report">
-            <span data-feather="plus-circle"></span>
-          </a>
-        </h6>
-        <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file-text"></span>
-              Current month
+            <a class="nav-link {% block filtersactive %}{% endblock filtersactive %}" href="{% url 'filters' %}">
+              <span data-feather="users"></span>
+              Saved Filters
             </a>
           </li>
         </ul>

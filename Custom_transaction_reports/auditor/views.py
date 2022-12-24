@@ -62,17 +62,27 @@ def register_user(request):
 
 def dashboard(request):
     url = 'http://127.0.0.1:8000/api/transaction'
-    data = requests.get(url = url, headers={'authorization':f'Bearer {Tokens.token}', 'content-type': 'application/json'})
+    data = send_request(request, url)
+    return render(request, 'auditor/dashboard-dashboard.html', {'data' : data[:-11:-1]})
+
+def transactions(request):
+    pass
+
+def filters(request):
+    url = f'http://127.0.0.1:8000/api/filter/{request.user}'
+    data = send_request(request, url)
+    return render(request, 'auditor/filters-dashboard.html', {'filters' : data})
+
+def send_request(request, url):
+    data = requests.get(url =url, headers={'authorization':f'Bearer {Tokens.token}', 'content-type': 'application/json'})
     if data.status_code == 200:
-        return render(request, 'auditor/dashboard-dashboard.html', {'data' : data.json()[:-11:-1]})
-
+        return data.json()
     if data.status_code == 401:
-        get_new_token()
-        return redirect('dashboard')
+        get_new_token(request)
+        return send_request(request,url)
 
-def get_new_token():
+def get_new_token(request):
     url = 'http://127.0.0.1:8000/api/token/refresh/'
-    data = requests.post(url = url, data = {"refresh": Tokens.refresh}).json()  
-    Tokens.token = data['access']
-    
+    data = requests.post(url = url, data = {"refresh": Tokens.refresh})
+    Tokens.token = data.json()['access']
                                         
