@@ -1,21 +1,18 @@
 {% extends 'auditor/base-dashboard.html' %}
-{% block title %}Transactions{% endblock title %}
+{% block title %}Products{% endblock title %}
 {% block productsactive %}active{% endblock productsactive %}
 {% block content %}
 <div class="container" style="margin-left:17%; width:83%">
-    <h4 class="my-3">Saved Filters</h4>
+    <h4 class="my-3">Products</h4>
     <ol>
-    {% for filter in products %}
+    {% for product in products %}
     <li>
     <form action="" method="post">
         {% csrf_token %}
     <ul class="list-group w-50 mb-1 mt-3">
-        <li class="list-group-item"><div class="form-group form-inline"><label>Filter Name:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="name" id="name-{{filter.id}}" value="{{filter.name}}" required></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Total amount lower than:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amount-lt" id="amount-lt-{{filter.id}}" value="{{filter.total_amount_lower_than}}"></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Total amount higher than:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amout-gt" id="amount-gt-{{filter.id}}" value="{{filter.total_amount_greater_than}}"></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Customer name:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="customer-name" id="customer-{{filter.id}}" value="{{filter.customer_name}}"></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done before date:</label><input type="date" disabled class="form-control option{{forloop.counter}}" name="date-lt" id="date-lt{{filter.id}}" value="{{filter.timestamp_lower_than}}"></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done after date:</label><input type="date" disabled class="form-control option{{forloop.counter}}" name="date-gt" id="date-gt{{filter.id}}" value="{{filter.timestamp_greater_than}}"></div></li>   
+        <li class="list-group-item"><div class="form-group form-inline"><label>Product Name:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="name" id="name-{{product.id}}" value="{{product.name}}" required></div></li>
+        <li class="list-group-item"><div class="form-group form-inline"><label>Cost:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amount-lt" id="amount-lt-{{product.id}}" value="{{product.cost}}"></div></li>
+        <li class="list-group-item"><div class="form-group form-inline"><label>Category:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amout-gt" id="amount-gt-{{product.id}}" value="{{product.category}}"></div></li>
     </ul>
     <button type='button' class="btn btn-primary my-3" id="button{{forloop.counter}}" onclick="edit({{forloop.counter}})">Edit</button>
     <button type="button" class="btn btn-danger m-2" id="delete-button{{forloop.counter}}" data-bs-toggle="modal" data-bs-target="#delete-modal{{i.id}}" value="{{i.id}}" hidden>Delete</button>
@@ -43,7 +40,7 @@
         <form action="" method="post" class="form-group">
             {% csrf_token %}
             <ul class="list-group w-50 mb-1 mt-3">
-                <li class="list-group-item"><div class="form-group form-inline"><label>Filter Name:</label><input type="text" class="form-control" name="name" required placeholder="Enter a name filter"></div></li>
+                <li class="list-group-item"><div class="form-group form-inline"><label>product Name:</label><input type="text" class="form-control" name="name" required placeholder="Enter a name product"></div></li>
                 <li class="list-group-item"><div class="form-group form-inline"><label>Total amount lower than:</label><input type="text" class="form-control" name="amount-lt" placeholder="Enter lower limit for total amount"></div></li>
                 <li class="list-group-item"><div class="form-group form-inline"><label>Total amount higher than:</label><input type="text" class="form-control" name="amout-gt" placeholder="Enter upper limit for total amount"></div></li>
                 <li class="list-group-item"><div class="form-group form-inline"><label>Customer name:</label><input type="text" class="form-control" name="customer-name" placeholder="Enter customer name"></div></li>
@@ -54,7 +51,7 @@
             <button type="submit" class="btn btn-info" id="submit-button">Save</button>
         </form>
     </li>
-    <button type="button" onclick="addNew()" class="btn btn-primary" id="add-new">Add new filter</button>
+    <button type="button" onclick="addNew()" class="btn btn-primary" id="add-new">Add new product</button>
     </div>
     </ol>
     <script>
