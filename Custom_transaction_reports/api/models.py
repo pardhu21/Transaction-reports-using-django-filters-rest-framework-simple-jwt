@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User
-from django.dispatch import receiver
+from django.utils import timezone
 
 # Create your models here.
 class Product(models.Model):
@@ -11,6 +11,7 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
 class Filter(models.Model):
     name = models.CharField(max_length=100)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -34,8 +35,8 @@ class Transaction(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     merchant = models.ForeignKey(User,on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through='TransactionProduct')
-    total_amount = models.IntegerField(blank=True, editable=False)
-    timestamp = models.TimeField(auto_now=True)
+    total_amount = models.IntegerField(blank=True, editable=False, null=True)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return f'ID:{self.id} Transaction between {self.customer} and {self.merchant}'
