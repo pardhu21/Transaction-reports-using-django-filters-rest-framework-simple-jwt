@@ -95,3 +95,24 @@ table {
 #content{
   margin-left: 10%;
 }
+
+.form-control:focus {
+  border-color: rgb(255,115,92);
+  box-shadow: 0 0 0 0.2rem rgba(255,115,92,0.25);
+}
+.btn-primary{
+  background-color: rgb(255,115,92);
+  border-color: white;
+}
+.btn-primary:hover{
+  background-color: rgb(255, 66, 37);
+  border: white;
+}
+.btn-primary:active{
+  background-color: rgb(255, 66, 37);
+  border: white;
+}
+.btn-primary:active{
+  background-color: rgb(255,115,92);;
+  border: white;
+}

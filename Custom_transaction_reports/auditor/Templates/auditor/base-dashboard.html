@@ -58,19 +58,19 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% block transactionsactive %}{% endblock transactionsactive %}" href="#">
+            <a class="nav-link {% block transactionsactive %}{% endblock transactionsactive %}" href="{% url 'transactions' %}">
               <span data-feather="file"></span>
               Transactions
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% block productsactive %}{% endblock productsactive %}" href="#">
+            <a class="nav-link {% block productsactive %}{% endblock productsactive %}" href="{% url 'products' %}">
               <span data-feather="shopping-cart"></span>
               Products
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% block customersactive %}{% endblock customersactive %}" href="#">
+            <a class="nav-link {% block customersactive %}{% endblock customersactive %}" href="{% url 'customers' %}">
               <span data-feather="users"></span>
               Customers
             </a>

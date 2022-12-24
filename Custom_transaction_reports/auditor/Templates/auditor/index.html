@@ -10,13 +10,17 @@
     <link rel="icon" type="image/x-icon" href="{% static '/favicon.ico' %}">
     <title>Auditor {% block title %}{% endblock title %}</title>
     <style>
-        .btn{
+        .btn-primary{
             background-color: rgb(255,115,92);
             border-color: white;
         }
-        .btn:hover{
+        .btn-primary:hover{
             background-color: rgb(255, 66, 37);
             border: white;
+        }
+        .form-control:focus {
+          border-color: rgb(255,115,92);
+          box-shadow: 0 0 0 0.2rem rgba(255,115,92,0.25);
         }
     </style>
 </head>
@@ -25,7 +29,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container d-flex flex-row">
           <div class="justify-content-start">
-          <h2>Auditor</h2>
+          <h2 style="color:rgb(255, 66, 37)">Auditor</h2>
           </div>
           <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">

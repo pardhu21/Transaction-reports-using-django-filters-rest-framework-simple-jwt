@@ -1,11 +1,11 @@
 {% extends 'auditor/base-dashboard.html' %}
-{% block title %}Filters{% endblock title %}
-{% block filtersactive %}active{% endblock filtersactive %}
+{% block title %}Transactions{% endblock title %}
+{% block productsactive %}active{% endblock productsactive %}
 {% block content %}
 <div class="container" style="margin-left:17%; width:83%">
     <h4 class="my-3">Saved Filters</h4>
     <ol>
-    {% for filter in filters %}
+    {% for filter in products %}
     <li>
     <form action="" method="post">
         {% csrf_token %}

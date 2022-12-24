@@ -10,5 +10,7 @@ urlpatterns = [
     path('logout', logout_user, name='logout'),
     path('dashboard', dashboard, name='dashboard'),
     path('transactions', transactions, name='transactions'),
+    path('products', products, name='products'),
+    path('customers', customers, name='customers'),
     path('filters', filters, name='filters')
 ]

@@ -62,27 +62,43 @@ def register_user(request):
 
 def dashboard(request):
     url = 'http://127.0.0.1:8000/api/transaction'
-    data = send_request(request, url)
+    data = send_request(url)
     return render(request, 'auditor/dashboard-dashboard.html', {'data' : data[:-11:-1]})
 
 def transactions(request):
-    pass
+    url = 'http://127.0.0.1:8000/api/transaction'
+    data = send_request(url)
+    return render(request, 'auditor/transactions-dashboard.html', {'transactions' : data})
+
+def products(request):
+    url = 'http://127.0.0.1:8000/api/product'
+    data = send_request(url)
+    return render(request, 'auditor/products-dashboard.html', {'products' : data})
+
+def customers(request):
+    url = 'http://127.0.0.1:8000/api/customer'
+    data = send_request(url)
+    return render(request, 'auditor/customers-dashboard.html', {'customers' : data})
 
 def filters(request):
     url = f'http://127.0.0.1:8000/api/filter/{request.user}'
-    data = send_request(request, url)
+    data = send_request(url)
     return render(request, 'auditor/filters-dashboard.html', {'filters' : data})
 
-def send_request(request, url):
+def send_request(url):
     data = requests.get(url =url, headers={'authorization':f'Bearer {Tokens.token}', 'content-type': 'application/json'})
     if data.status_code == 200:
         return data.json()
     if data.status_code == 401:
-        get_new_token(request)
-        return send_request(request,url)
+        url_ = 'http://127.0.0.1:8000/api/token/refresh/'
+        data_ = requests.post(url = url_, data = {"refresh": Tokens.refresh})
+        if data_.status_code == 400:
+            return redirect('login')
+        Tokens.token = data_.json()['access']
+        return send_request(url)
 
-def get_new_token(request):
-    url = 'http://127.0.0.1:8000/api/token/refresh/'
-    data = requests.post(url = url, data = {"refresh": Tokens.refresh})
-    Tokens.token = data.json()['access']
+# def get_new_token(request):
+#     url = 'http://127.0.0.1:8000/api/token/refresh/'
+#     data = requests.post(url = url, data = {"refresh": Tokens.refresh})
+#     Tokens.token = data.json()['access']
                                         
