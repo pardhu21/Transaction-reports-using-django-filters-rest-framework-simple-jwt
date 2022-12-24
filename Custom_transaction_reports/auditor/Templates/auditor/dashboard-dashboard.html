@@ -5,17 +5,32 @@
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
       <h1 class="h2">Dashboard</h1>
-      <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-          <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-          <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-        </div>
-        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-          <span data-feather="calendar"></span>
-          This week
-        </button>
-      </div>
     </div>
+    <h2>Last ten transactions</h2>
+    <div id="myChart" style="width:100%; max-width:1200px; height:500px;"></div>
+
+    <script>
+    google.charts.load('current',{packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+    // Set Data
+    var data = google.visualization.arrayToDataTable([
+      ['Price', 'Total amount'],
+      {% for i in data %}
+      [{{forloop.counter}},{{i.total_amount}}],
+      {% endfor %}
+    ]);
+    // Set Options
+    var options = {
+      vAxis: {title: 'Price'},
+      legend: 'none'
+    };
+    // Draw
+    var chart = new google.visualization.LineChart(document.getElementById('myChart'));
+    chart.draw(data, options);
+    }
+    </script>
     <h2>Recent transactions</h2>
     <div class="table-responsive">
       <table class="table table-striped table-sm">
