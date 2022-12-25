@@ -6,32 +6,33 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
       <h1 class="h2">Dashboard</h1>
     </div>
-    <h2>Last ten transactions</h2>
-    <div id="myChart" style="width:100%; max-width:1200px; height:500px;"></div>
+    <h2>Recent Transactions</h2>
+    <canvas id="myChart" style="width:100%;max-width:1200px; max-height:450px"></canvas>
 
     <script>
-    google.charts.load('current',{packages:['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
+    var xValues = [{% for i in data %}{{forloop.counter}},{% endfor %}];
+    var yValues = [{% for i in data %}{{i.total_amount}},{% endfor %}];
 
-    function drawChart() {
-    // Set Data
-    var data = google.visualization.arrayToDataTable([
-      ['Price', 'Total amount'],
-      {% for i in data %}
-      [{{forloop.counter}},{{i.total_amount}}],
-      {% endfor %}
-    ]);
-    // Set Options
-    var options = {
-      vAxis: {title: 'Price'},
-      legend: 'none'
-    };
-    // Draw
-    var chart = new google.visualization.LineChart(document.getElementById('myChart'));
-    chart.draw(data, options);
-    }
+    new Chart("myChart", {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [{
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgb(255,83,56)",
+          borderColor: "rgba(255,109,86,0.5)",
+          data: yValues
+        }]
+      },
+      options: {
+        legend: {display: false},
+        scales: {
+          yAxes: [{ticks: {min: 0}}],
+        }
+      }
+    });
     </script>
-    <h2>Recent transactions</h2>
     <div class="table-responsive">
       <table class="table table-striped table-sm">
         <thead>
