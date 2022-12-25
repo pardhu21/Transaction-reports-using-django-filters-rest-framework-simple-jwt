@@ -5,7 +5,7 @@ from django.utils import timezone
 
 # Create your models here.
 class Product(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     cost = models.IntegerField()
     category = models.CharField(max_length=50) #make it a select type field by adding few pre defined categories
 
