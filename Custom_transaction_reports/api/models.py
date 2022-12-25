@@ -18,8 +18,7 @@ class Filter(models.Model):
     total_amount_lower_than = models.IntegerField(blank=True, null=True)
     total_amount_greater_than = models.IntegerField(blank=True, null=True)
     customer_name = models.CharField(max_length=100,blank=True,null=True)
-    timestamp_lower_than = models.IntegerField(blank=True, null=True)
-    timestamp_greater_than = models.IntegerField(blank=True, null=True)
+    pin_code =models.IntegerField(blank=True,null=True)
 
     def __str__(self):
         return self.name

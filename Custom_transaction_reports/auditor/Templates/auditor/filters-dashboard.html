@@ -14,8 +14,7 @@
         <li class="list-group-item"><div class="form-group form-inline"><label>Total amount lower than:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amount-lt" id="amount-lt-{{filter.id}}" value="{{filter.total_amount_lower_than}}"></div></li>
         <li class="list-group-item"><div class="form-group form-inline"><label>Total amount higher than:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amout-gt" id="amount-gt-{{filter.id}}" value="{{filter.total_amount_greater_than}}"></div></li>
         <li class="list-group-item"><div class="form-group form-inline"><label>Customer name:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="customer-name" id="customer-{{filter.id}}" value="{{filter.customer_name}}"></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done before date:</label><input type="date" disabled class="form-control option{{forloop.counter}}" name="date-lt" id="date-lt{{filter.id}}" value="{{filter.timestamp_lower_than}}"></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done after date:</label><input type="date" disabled class="form-control option{{forloop.counter}}" name="date-gt" id="date-gt{{filter.id}}" value="{{filter.timestamp_greater_than}}"></div></li>   
+        <li class="list-group-item"><div class="form-group form-inline"><label>Pin code:</label><input type="number" disabled class="form-control option{{forloop.counter}}" name="pin-code" id="pin-code-{{filter.id}}" value="{{filter.pin_code}}"></div></li>  
     </ul>
     <button type='button' class="btn btn-primary my-3" id="button{{forloop.counter}}" onclick="edit({{forloop.counter}})">Edit</button>
     <button type="button" class="btn btn-danger m-2" id="delete-button{{forloop.counter}}" data-bs-toggle="modal" data-bs-target="#delete-modal{{i.id}}" value="{{i.id}}" hidden>Delete</button>
@@ -47,8 +46,7 @@
                 <li class="list-group-item"><div class="form-group form-inline"><label>Total amount lower than:</label><input type="text" class="form-control" name="amount-lt" placeholder="Enter lower limit for total amount"></div></li>
                 <li class="list-group-item"><div class="form-group form-inline"><label>Total amount higher than:</label><input type="text" class="form-control" name="amout-gt" placeholder="Enter upper limit for total amount"></div></li>
                 <li class="list-group-item"><div class="form-group form-inline"><label>Customer name:</label><input type="text" class="form-control" name="customer-name" placeholder="Enter customer name"></div></li>
-                <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done before date:</label><input type="date" class="form-control" name="date-lt" placeholder="Enter lower limit for transaction date"></div></li>
-                <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done after date:</label><input type="date" class="form-control" name="date-gt" placeholder="Enter upper limit for transaction date"></div></li>   
+                <li class="list-group-item"><div class="form-group form-inline"><label>Pin code:</label><input type="number" class="form-control" name="pin-code" placeholder="Enter pin code"></div></li>  
             </ul>
             <button type='button' class="btn btn-warning m-3" id="new-cancel-button" onclick="addNew()">Cancel</button>
             <button type="submit" class="btn btn-info" id="submit-button">Save</button>

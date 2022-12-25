@@ -121,9 +121,3 @@ class LoginAPIView(GenericAPIView):
                 'token' : token
             })
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-def bogus(request):
-    dat = requests.get(url = 'http://127.0.0.1:8000/api/transaction', headers={'authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjcxNzQ2NTUxLCJpYXQiOjE2NzE3NDYyNTEsImp0aSI6ImQ3M2UyMDZiYTVmMjQ5NjA4NDkyZjZlZjdjMTkxZDYwIiwidXNlcl9pZCI6MX0.qXhY52RIcHGl5LXd9u6N8MR8w25yjQ-p3pUiFO8pSFE'}).json()
-    print(dat)
-    return HttpResponse('')
