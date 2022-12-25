@@ -59,7 +59,7 @@ def customer(request, customer_id):
     return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def products(request):
     products = Product.objects.all()
     serializer = ProductSerializer(products, many = True)

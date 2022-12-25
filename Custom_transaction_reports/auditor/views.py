@@ -28,13 +28,12 @@ def login_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(reverse('api:login'))
-        url = Tokens.BASE_URL + reverse('api:login')
+        url = reverse('api:login')
         details = {
             "username": username,
             "password": password
         }
-        data = requests.post(url = url, data=details)
+        data = requests.post(url = Tokens.BASE_URL + url, data=details)
         if data.status_code == 200:
             data = data.json()
             user = User.objects.get(username = username)
@@ -48,7 +47,7 @@ def register_user(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        url = Tokens.BASE_URL + reverse('api:register')
+        url = reverse('api:register')
         details = {
             "username": username,
             "email": email,
@@ -64,35 +63,37 @@ def register_user(request):
             return redirect('dashboard')
 
 def dashboard(request):
-    url = Tokens.BASE_URL + reverse('api:transactions')
+    url = reverse('api:transactions')
     data = send_request(url)
     return render(request, 'auditor/dashboard-dashboard.html', {'data' : data[:-11:-1]})
 
 def transactions(request):
-    url = Tokens.BASE_URL + reverse('api:transactions')
+    url = reverse('api:transactions')
     data = send_request(url)
     return render(request, 'auditor/transactions-dashboard.html', {'transactions' : data})
 
 def products(request):
-    url = Tokens.BASE_URL + reverse('api:products')
+    url = reverse('api:products')
     data = send_request(url)
     return render(request, 'auditor/products-dashboard.html', {'products' : data})
 
 def customers(request):
-    url = Tokens.BASE_URL + reverse('api:customers')
+    url = reverse('api:customers')
     data = send_request(url)
     return render(request, 'auditor/customers-dashboard.html', {'customers' : data})
 
 def filters(request):
-    url = Tokens.BASE_URL + reverse('api:filter', kwargs={'username': request.user})
+    url = reverse('api:filter', kwargs={'username': request.user})
     data = send_request(url)
     return render(request, 'auditor/filters-dashboard.html', {'filters' : data})
 
 def product_volume(request):
-    pass
+    product_volume = get_product_volume()
+    return HttpResponse(product_volume.items())
 
 def product_value(request):
-    pass
+    product_value = get_product_value()
+    return HttpResponse(product_value.items())
 
 def customer_volume(request):
     pass
@@ -103,8 +104,32 @@ def customer_value(request):
 def complete_report(request):
     pass
 
+def get_product_volume():
+    transactions_url = reverse('api:transactions')
+    transactions = send_request(transactions_url)
+    product_volume = {}
+    for transaction in transactions:
+        for i in transaction['product_quantity']:
+            if product_volume.get(i[0]):
+                product_volume[i[0]] += i[1]
+            else:
+                product_volume[i[0]] = i[1]
+    return product_volume
+
+def get_product_value():
+    product_volume = get_product_volume()
+    products_url = reverse('api:products')
+    products = send_request(products_url)
+    product_value = {}
+    for i in product_volume:
+        for product in products:
+            if i == product['name']:
+                product_value[i] = product['cost'] * product_volume[i]
+    return product_value
+
 def send_request(url):
-    data = requests.get(url =url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+    url = Tokens.BASE_URL + url
+    data = requests.get(url = url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
     if data.status_code == 200:
         return data.json()
     if data.status_code == 401:
