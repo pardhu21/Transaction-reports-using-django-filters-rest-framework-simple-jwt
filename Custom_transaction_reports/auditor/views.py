@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
 import requests
@@ -6,8 +7,9 @@ from django.http import HttpResponse
 
 # Create your views here.
 class Tokens:
-    token = ''
-    refresh = ''
+    TOKEN = ''
+    REFRESH = ''
+    BASE_URL = 'http://127.0.0.1:8000'
 
 def home(request):
     return render(request, 'auditor/home.html')
@@ -26,7 +28,8 @@ def login_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        url = 'http://127.0.0.1:8000/api/login'
+        print(reverse('api:login'))
+        url = Tokens.BASE_URL + reverse('api:login')
         details = {
             "username": username,
             "password": password
@@ -35,8 +38,8 @@ def login_user(request):
         if data.status_code == 200:
             data = data.json()
             user = User.objects.get(username = username)
-            Tokens.token = data['token']['access']
-            Tokens.refresh = data['token']['refresh']
+            Tokens.TOKEN = data['token']['access']
+            Tokens.REFRESH = data['token']['refresh']
             login(request, user)
             return redirect('dashboard')
         
@@ -45,7 +48,7 @@ def register_user(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        url = 'http://127.0.0.1:8000/api/register'
+        url = Tokens.BASE_URL + reverse('api:register')
         details = {
             "username": username,
             "email": email,
@@ -55,46 +58,61 @@ def register_user(request):
         if data.status_code == 201:
             data = data.json()
             user = User.objects.get(username = username)
-            Tokens.token = data['token']['access']
-            Tokens.refresh = data['token']['refresh']
+            Tokens.TOKEN = data['token']['access']
+            Tokens.REFRESH = data['token']['refresh']
             login(request, user)
             return redirect('dashboard')
 
 def dashboard(request):
-    url = 'http://127.0.0.1:8000/api/transaction'
+    url = Tokens.BASE_URL + reverse('api:transactions')
     data = send_request(url)
     return render(request, 'auditor/dashboard-dashboard.html', {'data' : data[:-11:-1]})
 
 def transactions(request):
-    url = 'http://127.0.0.1:8000/api/transaction'
+    url = Tokens.BASE_URL + reverse('api:transactions')
     data = send_request(url)
     return render(request, 'auditor/transactions-dashboard.html', {'transactions' : data})
 
 def products(request):
-    url = 'http://127.0.0.1:8000/api/product'
+    url = Tokens.BASE_URL + reverse('api:products')
     data = send_request(url)
     return render(request, 'auditor/products-dashboard.html', {'products' : data})
 
 def customers(request):
-    url = 'http://127.0.0.1:8000/api/customer'
+    url = Tokens.BASE_URL + reverse('api:customers')
     data = send_request(url)
     return render(request, 'auditor/customers-dashboard.html', {'customers' : data})
 
 def filters(request):
-    url = f'http://127.0.0.1:8000/api/filter/{request.user}'
+    url = Tokens.BASE_URL + reverse('api:filter', kwargs={'username': request.user})
     data = send_request(url)
     return render(request, 'auditor/filters-dashboard.html', {'filters' : data})
 
+def product_volume(request):
+    pass
+
+def product_value(request):
+    pass
+
+def customer_volume(request):
+    pass
+
+def customer_value(request):
+    pass
+
+def complete_report(request):
+    pass
+
 def send_request(url):
-    data = requests.get(url =url, headers={'authorization':f'Bearer {Tokens.token}', 'content-type': 'application/json'})
+    data = requests.get(url =url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
     if data.status_code == 200:
         return data.json()
     if data.status_code == 401:
-        url_ = 'http://127.0.0.1:8000/api/token/refresh/'
-        data_ = requests.post(url = url_, data = {"refresh": Tokens.refresh})
+        url_ = Tokens.BASE_URL + reverse('token_refresh')
+        data_ = requests.post(url = url_, data = {"refresh": Tokens.REFRESH})
         if data_.status_code == 400:
             return redirect('login')
-        Tokens.token = data_.json()['access']
+        Tokens.TOKEN = data_.json()['access']
         return send_request(url)
 
 # def get_new_token(request):
