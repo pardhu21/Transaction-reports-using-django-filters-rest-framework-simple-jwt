@@ -13,6 +13,7 @@ urlpatterns = [
     path('product', products, name='products'),
     path('product/<int:product_id>',product, name='product'),
     path('filter/<str:username>', filter, name='filter'),
+    path('filter/id/<str:filter_id>', filter_id, name='filter-by-id'),
     path('register', RegisterAPIView.as_view(), name='register'),
     path('login', LoginAPIView.as_view(), name='login'),
 ]

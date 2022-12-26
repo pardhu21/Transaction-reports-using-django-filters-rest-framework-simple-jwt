@@ -14,6 +14,7 @@ urlpatterns = [
     path('customers', customers, name='customers'),
     path('filters', filters, name='filters'),
     path('product-volume', product_volume, name='product-volume'),
+    path('get-product-volume/<str:query>', get_product_volume, name='get-product-volume'),
     path('product-value', product_value, name='product-value'),
     path('customer-volume', customer_volume, name='customer-volume'),
     path('customer-value', customer_value, name='customer-value'),

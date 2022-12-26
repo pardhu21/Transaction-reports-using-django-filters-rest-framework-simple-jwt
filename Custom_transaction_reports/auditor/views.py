@@ -2,9 +2,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
-import requests
-from django.http import HttpResponse
-
+import requests, json
+from django.http import HttpResponse,JsonResponse
 # Create your views here.
 class Tokens:
     TOKEN = ''
@@ -88,8 +87,9 @@ def filters(request):
     return render(request, 'auditor/filters-dashboard.html', {'filters' : data})
 
 def product_volume(request):
-    product_volume = get_product_volume()
-    return HttpResponse(product_volume.items())
+    url = reverse('api:filter', kwargs={'username' : request.user})
+    filters = send_request(url)
+    return render(request, 'auditor/product-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def product_value(request):
     product_value = get_product_value()
@@ -104,9 +104,12 @@ def customer_value(request):
 def complete_report(request):
     pass
 
-def get_product_volume():
+def get_product_volume(request, query):
     transactions_url = reverse('api:transactions')
-    transactions = send_request(transactions_url)
+    if query == 'x':
+        transactions = send_request(transactions_url)
+    else:
+        transactions = send_request(transactions_url + '?' + query)
     product_volume = {}
     for transaction in transactions:
         for i in transaction['product_quantity']:
@@ -114,7 +117,7 @@ def get_product_volume():
                 product_volume[i[0]] += i[1]
             else:
                 product_volume[i[0]] = i[1]
-    return product_volume
+    return JsonResponse(product_volume, safe=False)
 
 def get_product_value():
     product_volume = get_product_volume()
@@ -127,9 +130,12 @@ def get_product_value():
                 product_value[i] = product['cost'] * product_volume[i]
     return product_value
 
-def send_request(url):
+def send_request(url, params = None):
     url = Tokens.BASE_URL + url
-    data = requests.get(url = url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+    if params:
+        data = requests.get(url = url, params=params, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+    else:
+        data = requests.get(url = url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
     if data.status_code == 200:
         return data.json()
     if data.status_code == 401:

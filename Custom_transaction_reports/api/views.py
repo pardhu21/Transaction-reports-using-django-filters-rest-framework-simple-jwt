@@ -80,6 +80,13 @@ def filter(request, username):
     serializer = FilterSerializer(filters, many = True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def filter_id(request, filter_id):
+    filter_id = int(filter_id)
+    filter = Filter.objects.get(pk = filter_id)
+    serializer = FilterSerializer(filter)
+    return Response(serializer.data)
+
 
 class RegisterAPIView(GenericAPIView):
     serializer_class = RegisterSerializer

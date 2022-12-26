@@ -100,6 +100,13 @@ table {
   border-color: rgb(255,115,92);
   box-shadow: 0 0 0 0.2rem rgba(255,115,92,0.25);
 }
+.form-select:focus {
+  border-color: rgb(255,115,92);
+  box-shadow: 0 0 0 0.2rem rgba(255,115,92,0.25);
+}
+select option:hover {
+  box-shadow: 0 0 10px 100px #a87f18 inset;
+}
 .btn-primary{
   background-color: rgb(255,115,92);
   border-color: white;
