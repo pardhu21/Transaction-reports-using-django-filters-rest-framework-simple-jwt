@@ -92,8 +92,9 @@ def product_volume(request):
     return render(request, 'auditor/product-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def product_value(request):
-    product_value = get_product_value()
-    return HttpResponse(product_value.items())
+    url = reverse('api:filter', kwargs={'username' : request.user})
+    filters = send_request(url)
+    return render(request, 'auditor/product-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def customer_volume(request):
     pass
@@ -119,8 +120,19 @@ def get_product_volume(request, query):
                 product_volume[i[0]] = i[1]
     return JsonResponse(product_volume, safe=False)
 
-def get_product_value():
-    product_volume = get_product_volume()
+def get_product_value(request,query):
+    transactions_url = reverse('api:transactions')
+    if query == 'x':
+        transactions = send_request(transactions_url)
+    else:
+        transactions = send_request(transactions_url + '?' + query)
+    product_volume = {}
+    for transaction in transactions:
+        for i in transaction['product_quantity']:
+            if product_volume.get(i[0]):
+                product_volume[i[0]] += i[1]
+            else:
+                product_volume[i[0]] = i[1]
     products_url = reverse('api:products')
     products = send_request(products_url)
     product_value = {}
@@ -128,7 +140,7 @@ def get_product_value():
         for product in products:
             if i == product['name']:
                 product_value[i] = product['cost'] * product_volume[i]
-    return product_value
+    return JsonResponse(product_value, safe=False)
 
 def send_request(url, params = None):
     url = Tokens.BASE_URL + url

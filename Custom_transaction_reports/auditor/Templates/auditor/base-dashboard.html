@@ -92,29 +92,29 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'product-volume' %}">
+            <a class="nav-link {% block productvolumeactive %}{% endblock productvolumeactive %}" href="{% url 'product-volume' %}">
               <span data-feather="file-text"></span>
               Product volume report
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'product-value' %}">
+            <a class="nav-link {% block productvalueactive %}{% endblock productvalueactive %}" href="{% url 'product-value' %}">
               <span data-feather="file-text"></span>
               Product value report
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'customer-volume' %}">
+            <a class="nav-link {% block customervolumeactive %}{% endblock customervolumeactive %}" href="{% url 'customer-volume' %}">
               <span data-feather="file-text"></span>
               Customer volume report
             </a>
           </li><li class="nav-item">
-            <a class="nav-link" href="{% url 'customer-value' %}">
+            <a class="nav-link {% block customervalueactive %}{% endblock customervalueactive %}" href="{% url 'customer-value' %}">
               <span data-feather="file-text"></span>
               Customer value report
             </a>
           </li><li class="nav-item">
-            <a class="nav-link" href="{% url 'complete-report' %}">
+            <a class="nav-link {% block completereportactive %}{% endblock completereportactive %}" href="{% url 'complete-report' %}">
               <span data-feather="file-text"></span>
               Complete report
             </a>
