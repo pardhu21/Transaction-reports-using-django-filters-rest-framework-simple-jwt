@@ -97,10 +97,14 @@ def product_value(request):
     return render(request, 'auditor/product-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def customer_volume(request):
-    pass
+    url = reverse('api:filter', kwargs={'username' : request.user})
+    filters = send_request(url)
+    return render(request, 'auditor/customer-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def customer_value(request):
-    pass
+    url = reverse('api:filter', kwargs={'username' : request.user})
+    filters = send_request(url)
+    return render(request, 'auditor/customer-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def complete_report(request):
     pass
@@ -118,6 +122,7 @@ def get_product_volume(request, query):
                 product_volume[i[0]] += i[1]
             else:
                 product_volume[i[0]] = i[1]
+    product_volume = {k:v for k, v in sorted(product_volume.items(), key=lambda x : x[1], reverse=True)}
     return JsonResponse(product_volume, safe=False)
 
 def get_product_value(request,query):
@@ -140,14 +145,54 @@ def get_product_value(request,query):
         for product in products:
             if i == product['name']:
                 product_value[i] = product['cost'] * product_volume[i]
+    product_value = {k:v for k, v in sorted(product_value.items(), key=lambda x : x[1], reverse=True)}
     return JsonResponse(product_value, safe=False)
 
-def send_request(url, params = None):
-    url = Tokens.BASE_URL + url
-    if params:
-        data = requests.get(url = url, params=params, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+def get_customer_volume(request, query):
+    transactions_url = reverse('api:transactions')
+    if query == 'x':
+        transactions = send_request(transactions_url)
     else:
-        data = requests.get(url = url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+        transactions = send_request(transactions_url + '?' + query)
+    customer_volume = {}
+    for transaction in transactions:
+        if customer_volume.get(transaction['customer']):
+            customer_volume[transaction['customer']] += len(transaction['product_quantity'])
+        else:
+            customer_volume[transaction['customer']] = len(transaction['product_quantity'])
+    customer_volume = get_customer_dict(customer_volume)
+    return JsonResponse(customer_volume, safe=False)
+
+def get_customer_value(request,query):
+    transactions_url = reverse('api:transactions')
+    if query == 'x':
+        transactions = send_request(transactions_url)
+    else:
+        transactions = send_request(transactions_url + '?' + query)
+    customer_value = {}
+    for transaction in transactions:
+        if customer_value.get(transaction['customer']):
+            customer_value[transaction['customer']] += transaction['total_amount']
+        else:
+            customer_value[transaction['customer']] = transaction['total_amount']
+    customer_value = get_customer_dict(customer_value)
+    return JsonResponse(customer_value, safe=False)
+
+def get_customer_dict(customer_dict):
+    customers = send_request(reverse('api:customers'))
+    new_dict = {}
+    for i in customer_dict:
+        for j in customers:
+            if i == j['id']:
+                new_dict[j['name']] = customer_dict[i]
+    new_dict = {k:v for k, v in sorted(new_dict.items(), key=lambda x : x[1], reverse=True)}
+    return new_dict
+
+def send_request(url, params = None):
+    if params:
+        data = requests.get(url = Tokens.BASE_URL + url, params=params, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+    else:
+        data = requests.get(url = Tokens.BASE_URL + url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
     if data.status_code == 200:
         return data.json()
     if data.status_code == 401:
