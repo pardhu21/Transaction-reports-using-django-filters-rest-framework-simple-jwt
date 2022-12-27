@@ -21,5 +21,7 @@ urlpatterns = [
     path('get-customer-volume/<str:query>', get_customer_volume, name='get-customer-volume'),
     path('customer-value', customer_value, name='customer-value'),
     path('get-customer-value/<str:query>', get_customer_value, name='get-customer-value'),
-    path('complete-report', complete_report, name='complete-report')
+    path('complete-report', complete_report, name='complete-report'),
+    path('get-transactions/', get_transactions, name='get-transactions'),
+    path('get-transactions/<str:query>', get_transactions, name='get-transactions-query')
 ]

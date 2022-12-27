@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
-import requests, json
-from django.http import HttpResponse,JsonResponse
+import requests
+from django.http import JsonResponse
+from django.core.paginator import Paginator
 # Create your views here.
 class Tokens:
     TOKEN = ''
@@ -69,7 +70,10 @@ def dashboard(request):
 def transactions(request):
     url = reverse('api:transactions')
     data = send_request(url)
-    return render(request, 'auditor/transactions-dashboard.html', {'transactions' : data})
+    paginator = Paginator(data, 15)
+    page_number = request.GET.get('page')
+    transactions = paginator.get_page(page_number)
+    return render(request, 'auditor/transactions-dashboard.html', {'transactions' : transactions})
 
 def products(request):
     url = reverse('api:products')
@@ -107,7 +111,10 @@ def customer_value(request):
     return render(request, 'auditor/customer-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def complete_report(request):
-    pass
+    filter_url = reverse('api:filter', kwargs={'username' : request.user})
+    filters = send_request(filter_url)
+    return render(request, 'auditor/complete-report.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
+
 
 def get_product_volume(request, query):
     transactions_url = reverse('api:transactions')
@@ -177,6 +184,14 @@ def get_customer_value(request,query):
             customer_value[transaction['customer']] = transaction['total_amount']
     customer_value = get_customer_dict(customer_value)
     return JsonResponse(customer_value, safe=False)
+
+def get_transactions(request, query = None):
+    url = reverse('api:transactions')
+    if query:
+        transactions = send_request(url + '?' + query)
+    else:
+        transactions = send_request(url)
+    return JsonResponse(transactions, safe=False)
 
 def get_customer_dict(customer_dict):
     customers = send_request(reverse('api:customers'))

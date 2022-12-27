@@ -1,0 +1,173 @@
+{% extends 'auditor/base-dashboard.html' %}
+{% block title %}Complete Report{% endblock title %}
+{% block completereportactive %}active{% endblock completereportactive %}
+{% block content %}
+<div class="container" style="margin-left:17%; width:83%">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 mt-1 border-bottom">
+        <h1 class="h2">Complete Report</h1>
+        <div class="btn-toolbar d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center mb-2 mb-md-0">
+            <div class="btn-toolbar mb-2 mb-md-0 px-1">
+                <label for="from-date">From date:</label>
+                <input id="from-date" type="date" class="form-control">
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0 px-1">
+                <label for="to-date">To date:</label>
+                <input type="date" id="to-date" class="form-control">
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0 px-1">
+                <label for="filter-select">Select filter:</label>
+                <select class="form-select" id="filter-select" aria-label="Default select example">    
+                    <option class="select-option" value="0" selected>No filter</option>
+                    {% for filter in filters %}
+                    <option class="select-option" value="{{filter.id}}">{{filter.name}}</option>
+                    {% endfor %}
+            </select>
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0 px-1" style="margin-top: 20px;">
+                <button class="btn btn-primary" id="apply" onclick="newResponse()">Apply</button>
+            </select>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Transaction ID</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Merchant</th>
+              <th scope="col">Products (quantity)</th>
+              <th scope="col">Total amount</th>
+              <th scope="col">Pin code</th>
+              <th scope="col">Transaction date and time</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+          </tbody>
+        </table>
+      <nav aria-label="...">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled" value="0" id="prev" onclick="prevPage(value)">
+            <a class="page-link" href="#" tabindex="-1">Previous</a>
+          </li>
+          <li class="page-item" value="2" id="next" onclick="nextPage(value)">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+      </nav>
+</div>
+<script>
+    let transactions = [];
+    let page_number = 1;
+    let per_page = 15;
+    async function newResponse(){
+        var filter_id = document.getElementById('filter-select').value;
+        if(filter_id == 0){
+            return getTransactions('')
+        }
+        var start_date = document.getElementById('from-date').value;
+        var to_date = document.getElementById('to-date').value;
+        var url = '{{base_url}}' + '/api/filter/id/' + filter_id;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const filter = await response.json();
+        const params = {
+            'total_amount__lt' : filter['total_amount_lower_than'],
+            'total_amount__gt' : filter['total_amount_greater_than'],
+            'customer__name__icontains' : filter['customer_name'],
+            'timestamp__lt' : to_date,
+            'timestamp__gt' : start_date
+        };
+        var query = ''
+        for(var i in params){
+            query += i + '=';
+            if(params[i]){
+                query += params[i];
+            }
+            query += '&';
+        }
+        getTransactions(query);
+    }
+    async function getTransactions(query = ''){
+        url = '{{base_url}}' + '{% url 'get-transactions' %}' + query;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        transactions = data;
+        table_data = paginator(data, 1, 15)['data'];
+        createTable(table_data);
+    }
+    function createTable(data){
+        data = paginator(data, 1, per_page)['data'];
+        var details = '<tbody>';
+        for (i of data){
+            details += '<tr>';
+            details += '<td>' + i['id'] + '</td>';
+            details += '<td>' + i['customer_name'] + '</td>';
+            details += '<td>' + i['merchant_name'] + '</td>';
+            var product_quantity = '';
+            for (j of i['product_quantity']){
+                product_quantity += `${j[0]} (${j[1]}), `
+            }
+            details += '<td>' + product_quantity.slice(0, -2) + '</td>';
+            details += '<td>' + i['total_amount'] + '</td>';
+            details += '<td>' + i['pin_code'] + '</td>';
+            details += '<td>' + i['timestamp'].slice(0, 10) + '</td>';
+            details += '</tr>';
+        }
+        details += '</tbody>';
+        document.getElementById('tbody').innerHTML = details;
+    }
+    function paginator(items, current_page, per_page_items) {
+        let page = current_page || 1,
+        per_page = per_page_items || 10,
+        offset = (page - 1) * per_page,
+    
+        paginatedItems = items.slice(offset).slice(0, per_page_items),
+        total_pages = Math.ceil(items.length / per_page);
+    
+        return {
+            page: page,
+            per_page: per_page,
+            pre_page: page - 1 ? page - 1 : null,
+            next_page: (total_pages > page) ? page + 1 : null,
+            total: items.length,
+            total_pages: total_pages,
+            data: paginatedItems
+        };
+    }
+    function prevPage(value){
+        var prev_page = document.getElementById('prev');
+        var next_page = document.getElementById('next');
+        let data = paginator(transactions, value, per_page);
+        if(prev_page.value == 1){
+            prev_page.classList.add('disabled');
+        }
+        if(next_page.classList.contains('disabled')){
+            next_page.classList.remove('disabled');
+            next_page.value -= 1;
+        }
+        prev_page.value -= 1;
+        createTable(data['data']);
+    }
+    function nextPage(value){
+        var prev_page = document.getElementById('prev');
+        var next_page = document.getElementById('next')
+        let data = paginator(transactions, value, per_page);
+        if (data['total_pages'] === next_page.value){
+            next_page.classList.add('disabled');
+        }
+        if(prev_page.classList.contains('disabled')){
+            prev_page.classList.remove('disabled');
+            prev_page.value += 1;
+        }
+        next_page.value += 1;
+        createTable(data['data']);
+    }
+    getTransactions();
+</script>
+{% endblock %}

@@ -120,6 +120,23 @@ select option:hover {
   border: white;
 }
 .btn-primary:active{
-  background-color: rgb(255,115,92);;
+  background-color: rgb(255,115,92);
   border: white;
+}
+.page-link{
+  position: relative;
+  display: block;
+  color: rgb(255,115,92);
+}
+.page-link:hover{
+  position: relative;
+  display: block;
+  color: rgb(255, 66, 37);
+}
+.page-link:focus {
+  z-index: 3;
+  color: rgb(255, 66, 37);
+  background-color: #e9ecef;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(255,115,92,0.25);
 }

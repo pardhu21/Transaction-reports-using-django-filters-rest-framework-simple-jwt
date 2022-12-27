@@ -35,4 +35,21 @@
           {% endfor %}
         </tbody>
       </table>
+    <nav aria-label="...">
+      <ul class="pagination justify-content-center">
+        <li class="page-item {% if not transactions.has_previous %}disabled{% endif %}">
+          <a class="page-link" href="{% if transactions.has_previous %}?page={{ transactions.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+        </li>
+        <li class="page-item disabled">
+          <a class="page-link" href="#">
+            <span class="current">
+              Page {{ transactions.number }} of {{ transactions.paginator.num_pages }}  
+          </span>
+          </a>
+        </li>
+        <li class="page-item {% if not transactions.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{% if transactions.has_next %}?page={{ transactions.next_page_number }}{% endif %}">Next</a>
+        </li>
+      </ul>
+    </nav>
 {% endblock content %}
