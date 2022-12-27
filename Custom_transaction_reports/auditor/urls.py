@@ -18,6 +18,8 @@ urlpatterns = [
     path('product-value', product_value, name='product-value'),
     path('get-product-value/<str:query>', get_product_value, name='get-product-value'),
     path('customer-volume', customer_volume, name='customer-volume'),
+    path('get-customer-volume/<str:query>', get_customer_volume, name='get-customer-volume'),
     path('customer-value', customer_value, name='customer-value'),
+    path('get-customer-value/<str:query>', get_customer_value, name='get-customer-value'),
     path('complete-report', complete_report, name='complete-report')
 ]
