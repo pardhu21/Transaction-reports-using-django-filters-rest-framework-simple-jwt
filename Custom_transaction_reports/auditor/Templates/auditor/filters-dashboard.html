@@ -12,31 +12,34 @@
     <ul class="list-group w-50 mb-1 mt-3">
         <li class="list-group-item"><div class="form-group form-inline"><label>Filter Name:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="name" id="name-{{filter.id}}" value="{{filter.name}}" required></div></li>
         <li class="list-group-item"><div class="form-group form-inline"><label>Total amount lower than:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amount-lt" id="amount-lt-{{filter.id}}" value="{{filter.total_amount_lower_than}}"></div></li>
-        <li class="list-group-item"><div class="form-group form-inline"><label>Total amount higher than:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amout-gt" id="amount-gt-{{filter.id}}" value="{{filter.total_amount_greater_than}}"></div></li>
+        <li class="list-group-item"><div class="form-group form-inline"><label>Total amount higher than:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amount-gt" id="amount-gt-{{filter.id}}" value="{{filter.total_amount_greater_than}}"></div></li>
         <li class="list-group-item"><div class="form-group form-inline"><label>Customer name:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="customer-name" id="customer-{{filter.id}}" value="{{filter.customer_name}}"></div></li>
         <li class="list-group-item"><div class="form-group form-inline"><label>Pin code:</label><input type="number" disabled class="form-control option{{forloop.counter}}" name="pin-code" id="pin-code-{{filter.id}}" value="{{filter.pin_code}}"></div></li>  
     </ul>
     <button type='button' class="btn btn-primary my-3" id="button{{forloop.counter}}" onclick="edit({{forloop.counter}})">Edit</button>
-    <button type="button" class="btn btn-danger m-2" id="delete-button{{forloop.counter}}" data-bs-toggle="modal" data-bs-target="#delete-modal{{i.id}}" value="{{i.id}}" hidden>Delete</button>
-    <button type="submit" class="btn btn-info" id="submit-button{{forloop.counter}}" hidden>Save</button>
+    <button type="button" class="btn btn-danger m-2" id="delete-button{{forloop.counter}}" data-bs-toggle="modal" data-bs-target="#delete-modal{{filter.id}}" value="{{filter.id}}" hidden>Delete</button>
+    <button type="submit" class="btn btn-info" id="submit-button{{forloop.counter}}" name="submit-btn" value="{{filter.id}}" hidden>Save</button>
     </form>  
     </li>
     <!-- Modal -->
-    <div class="modal fade" id="delete-modal{{i.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="delete-modal{{filter.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
+        <div class="modal-content">
             <div class="modal-header alert-warning">
-              <h1 class="modal-title fs-5" id="modal-label{{i.id}}">Warning</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h1 class="modal-title fs-5" id="modal-label{{filter.id}}">Warning</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body alert-warning rounded">
-              <p>Are you sure you want to delete question <b>{{i.question}}</b>?</p>
-              <a href=""><button type="button" class="btn btn-primary float-end mx-2">Yes</button></a>
-              <button type="button" class="btn btn-secondary float-end" data-bs-dismiss="modal">Cancel</button>
+            <p>Are you sure you want to delete question <b>{{filter.name}}</b>?</p>   
+            <form action="" method="post">
+                {% csrf_token %}
+                <button type="submit" value="{{filter.id}}" name="delete" class="btn btn-primary float-end mx-2">Yes</button>
+            </form>
+            <button type="button" class="btn btn-secondary float-end" data-bs-dismiss="modal">Cancel</button>
             </div>
-          </div>
         </div>
-      </div> 
+        </div>
+    </div> 
     {% endfor %}
     <li hidden id="add-question">
         <form action="" method="post" class="form-group">

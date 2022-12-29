@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-import requests
+import requests,json
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -97,6 +97,38 @@ def customers(request):
     return render(request, 'auditor/customers-dashboard.html', {'customers' : data})
 
 def filters(request):
+    if request.method == 'POST':
+        url = Tokens.BASE_URL + reverse('api:filter', kwargs={'username' : request.user})
+        if request.POST.get('delete'):
+            requests.delete(url=url, json={"id":int(request.POST['delete'])}, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+            messages.info(request, 'Filter deleted successfully')
+        else:
+            post = {}
+            for i in request.POST:
+                if request.POST[i] != 'None':
+                    post[i] = request.POST[i]
+            feilds = {'submit-btn':'id', 'name':'name', 'amount-lt':'total_amount_lower_than', 'amount-gt':'total_amount_greater_than', 'customer-name':'customer_name', 'pin-code':'pin_code'}
+            body ={}
+            for i in feilds:
+                if post.get(i):
+                    body[feilds[i]] = post.get(i)
+            for i in body:
+                if i in ['id', 'total_amount_lower_than', 'total_amount_greater_than', 'pin_code']:
+                    body[i] = int(body[i])
+            body['user'] = request.user.id
+            result = json.dumps(body)
+            result = json.loads(result)
+            if not body.get('id'):
+                response = requests.post(url=url, json=body, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+            else:
+                response = requests.patch(url=url, json=body, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+            if response.status_code == 201:
+                messages.success(request, 'Filter created successfully')
+            elif response.status_code != 200:
+                messages.error(request, 'Something wrong has happened')
+            else:
+                messages.info(request, 'Successfully modifed the filter')
+    
     url = reverse('api:filter', kwargs={'username': request.user})
     data = send_request(url)
     return render(request, 'auditor/filters-dashboard.html', {'filters' : data})

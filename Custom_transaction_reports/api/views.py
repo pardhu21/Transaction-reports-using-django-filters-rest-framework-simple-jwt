@@ -71,7 +71,7 @@ def product(request, product_id):
     return Response(serializer.data)
 
 @api_view(['GET', 'PATCH', 'POST', 'DELETE'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def filter(request, username):
     if request.method == 'PATCH':
         filter = Filter.objects.get(pk = request.data['id'])
@@ -79,11 +79,15 @@ def filter(request, username):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'POST':
         serializer = FilterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'DELETE':
         filter = Filter.objects.get(pk = request.data['id'])
         filter.delete()
