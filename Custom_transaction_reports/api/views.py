@@ -10,8 +10,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-import requests
-from django.http import HttpResponse
 # Create your views here.
 
 class TransactionList(ListAPIView):
@@ -19,7 +17,7 @@ class TransactionList(ListAPIView):
     serializer_class = TransactionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = TransactioFilter
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -59,7 +57,7 @@ def customer(request, customer_id):
     return Response(serializer.data)
 
 @api_view(['GET'])
-#@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def products(request):
     products = Product.objects.all()
     serializer = ProductSerializer(products, many = True)
@@ -72,9 +70,24 @@ def product(request, product_id):
     serializer = ProductSerializer(product)
     return Response(serializer.data)
 
-@api_view(['GET'])
-#@permission_classes([IsAuthenticated])
+@api_view(['GET', 'PATCH', 'POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def filter(request, username):
+    if request.method == 'PATCH':
+        filter = Filter.objects.get(pk = request.data['id'])
+        serializer = FilterSerializer(filter, request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    if request.method == 'POST':
+        serializer = FilterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    if request.method == 'DELETE':
+        filter = Filter.objects.get(pk = request.data['id'])
+        filter.delete()
+        return Response(status=status.HTTP_200_OK)
     user = User.objects.get(username = username)
     filters = user.filter_set.all()
     serializer = FilterSerializer(filters, many = True)

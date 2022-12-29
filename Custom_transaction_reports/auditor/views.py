@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 import requests
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from django.contrib import messages
 # Create your views here.
 class Tokens:
     TOKEN = ''
@@ -22,6 +24,7 @@ def register(request):
 
 def logout_user(request):
     logout(request)
+    messages.success(request,'Successfully logged out')
     return redirect('home')
 
 def login_user(request):
@@ -40,7 +43,11 @@ def login_user(request):
             Tokens.TOKEN = data['token']['access']
             Tokens.REFRESH = data['token']['refresh']
             login(request, user)
+            messages.success(request, 'Successfully logged in')
             return redirect('dashboard')
+        if data.status_code == 400:
+            messages.warning(request, 'Invalid credentials, please enter correct details')
+            return redirect('login')
         
 def register_user(request):
     if request.method == 'POST':
@@ -60,7 +67,11 @@ def register_user(request):
             Tokens.TOKEN = data['token']['access']
             Tokens.REFRESH = data['token']['refresh']
             login(request, user)
+            messages.success(request, 'Account created successfully')
             return redirect('dashboard')
+        if data.status_code == 400:
+            messages.warning(request, 'Invalid credentials, please enter correct details')
+            return redirect()
 
 def dashboard(request):
     url = reverse('api:transactions')
