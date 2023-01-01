@@ -40,11 +40,14 @@ def login_user(request):
         if data.status_code == 200:
             data = data.json()
             user = User.objects.get(username = username)
+            response = redirect('dashboard')
             Tokens.TOKEN = data['token']['access']
+            response.set_cookie('access', data['token']['access'])
             Tokens.REFRESH = data['token']['refresh']
+            response.set_cookie('refresh', data['token']['refresh'])
             login(request, user)
             messages.success(request, 'Successfully logged in')
-            return redirect('dashboard')
+            return response
         if data.status_code == 400:
             messages.warning(request, 'Invalid credentials, please enter correct details')
             return redirect('login')
@@ -64,23 +67,26 @@ def register_user(request):
         if data.status_code == 201:
             data = data.json()
             user = User.objects.get(username = username)
+            response = redirect('dashboard')
             Tokens.TOKEN = data['token']['access']
+            response.set_cookie('access', data['token']['access'])
             Tokens.REFRESH = data['token']['refresh']
+            response.set_cookie('refresh', data['token']['refresh'])
             login(request, user)
             messages.success(request, 'Account created successfully')
-            return redirect('dashboard')
+            return response
         if data.status_code == 400:
             messages.warning(request, 'Invalid credentials, please enter correct details')
             return redirect()
 
 def dashboard(request):
     url = reverse('api:transactions')
-    data = send_request(url)
+    data = send_request(request, url)
     return render(request, 'auditor/dashboard-dashboard.html', {'data' : data[:-11:-1]})
 
 def transactions(request):
     url = reverse('api:transactions')
-    data = send_request(url)
+    data = send_request(request, url)
     paginator = Paginator(data, 15)
     page_number = request.GET.get('page')
     transactions = paginator.get_page(page_number)
@@ -88,19 +94,19 @@ def transactions(request):
 
 def products(request):
     url = reverse('api:products')
-    data = send_request(url)
+    data = send_request(request, url)
     return render(request, 'auditor/products-dashboard.html', {'products' : data})
 
 def customers(request):
     url = reverse('api:customers')
-    data = send_request(url)
+    data = send_request(request, url)
     return render(request, 'auditor/customers-dashboard.html', {'customers' : data})
 
 def filters(request):
     if request.method == 'POST':
         url = Tokens.BASE_URL + reverse('api:filter', kwargs={'username' : request.user})
         if request.POST.get('delete'):
-            requests.delete(url=url, json={"id":int(request.POST['delete'])}, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+            requests.delete(url=url, json={"id":int(request.POST['delete'])}, headers={'authorization':'Bearer ' + request.COOKIES['access'], 'content-type': 'application/json'})
             messages.info(request, 'Filter deleted successfully')
         else:
             post = {}
@@ -119,9 +125,9 @@ def filters(request):
             result = json.dumps(body)
             result = json.loads(result)
             if not body.get('id'):
-                response = requests.post(url=url, json=body, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+                response = requests.post(url=url, json=body, headers={'authorization':'Bearer ' + request.COOKIES['access'], 'content-type': 'application/json'})
             else:
-                response = requests.patch(url=url, json=body, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+                response = requests.patch(url=url, json=body, headers={'authorization':'Bearer ' + request.COOKIES['access'], 'content-type': 'application/json'})
             if response.status_code == 201:
                 messages.success(request, 'Filter created successfully')
             elif response.status_code != 200:
@@ -130,41 +136,41 @@ def filters(request):
                 messages.info(request, 'Successfully modifed the filter')
     
     url = reverse('api:filter', kwargs={'username': request.user})
-    data = send_request(url)
+    data = send_request(request, url)
     return render(request, 'auditor/filters-dashboard.html', {'filters' : data})
 
 def product_volume(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
-    filters = send_request(url)
+    filters = send_request(request, url)
     return render(request, 'auditor/product-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def product_value(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
-    filters = send_request(url)
+    filters = send_request(request, url)
     return render(request, 'auditor/product-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def customer_volume(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
-    filters = send_request(url)
+    filters = send_request(request, url)
     return render(request, 'auditor/customer-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def customer_value(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
-    filters = send_request(url)
+    filters = send_request(request, url)
     return render(request, 'auditor/customer-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 def complete_report(request):
     filter_url = reverse('api:filter', kwargs={'username' : request.user})
-    filters = send_request(filter_url)
+    filters = send_request(request, filter_url)
     return render(request, 'auditor/complete-report.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 
 def get_product_volume(request, query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
-        transactions = send_request(transactions_url)
+        transactions = send_request(request, transactions_url)
     else:
-        transactions = send_request(transactions_url + '?' + query)
+        transactions = send_request(request, transactions_url + '?' + query)
     product_volume = {}
     for transaction in transactions:
         for i in transaction['product_quantity']:
@@ -178,9 +184,9 @@ def get_product_volume(request, query):
 def get_product_value(request,query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
-        transactions = send_request(transactions_url)
+        transactions = send_request(request, transactions_url)
     else:
-        transactions = send_request(transactions_url + '?' + query)
+        transactions = send_request(request, transactions_url + '?' + query)
     product_volume = {}
     for transaction in transactions:
         for i in transaction['product_quantity']:
@@ -189,7 +195,7 @@ def get_product_value(request,query):
             else:
                 product_volume[i[0]] = i[1]
     products_url = reverse('api:products')
-    products = send_request(products_url)
+    products = send_request(request, products_url)
     product_value = {}
     for i in product_volume:
         for product in products:
@@ -201,43 +207,43 @@ def get_product_value(request,query):
 def get_customer_volume(request, query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
-        transactions = send_request(transactions_url)
+        transactions = send_request(request, transactions_url)
     else:
-        transactions = send_request(transactions_url + '?' + query)
+        transactions = send_request(request, transactions_url + '?' + query)
     customer_volume = {}
     for transaction in transactions:
         if customer_volume.get(transaction['customer']):
             customer_volume[transaction['customer']] += len(transaction['product_quantity'])
         else:
             customer_volume[transaction['customer']] = len(transaction['product_quantity'])
-    customer_volume = get_customer_dict(customer_volume)
+    customer_volume = get_customer_dict(request, customer_volume)
     return JsonResponse(customer_volume, safe=False)
 
 def get_customer_value(request,query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
-        transactions = send_request(transactions_url)
+        transactions = send_request(request, transactions_url)
     else:
-        transactions = send_request(transactions_url + '?' + query)
+        transactions = send_request(request, transactions_url + '?' + query)
     customer_value = {}
     for transaction in transactions:
         if customer_value.get(transaction['customer']):
             customer_value[transaction['customer']] += transaction['total_amount']
         else:
             customer_value[transaction['customer']] = transaction['total_amount']
-    customer_value = get_customer_dict(customer_value)
+    customer_value = get_customer_dict(request, customer_value)
     return JsonResponse(customer_value, safe=False)
 
 def get_transactions(request, query = None):
     url = reverse('api:transactions')
     if query:
-        transactions = send_request(url + '?' + query)
+        transactions = send_request(request, url + '?' + query)
     else:
-        transactions = send_request(url)
+        transactions = send_request(request, url)
     return JsonResponse(transactions, safe=False)
 
-def get_customer_dict(customer_dict):
-    customers = send_request(reverse('api:customers'))
+def get_customer_dict(request, customer_dict):
+    customers = send_request(request, reverse('api:customers'))
     new_dict = {}
     for i in customer_dict:
         for j in customers:
@@ -246,23 +252,18 @@ def get_customer_dict(customer_dict):
     new_dict = {k:v for k, v in sorted(new_dict.items(), key=lambda x : x[1], reverse=True)}
     return new_dict
 
-def send_request(url, params = None):
+def send_request(request, url, params = None):
     if params:
-        data = requests.get(url = Tokens.BASE_URL + url, params=params, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+        data = requests.get(url = Tokens.BASE_URL + url, params=params, headers={'authorization':'Bearer ' + request.COOKIES['access'], 'content-type': 'application/json'})
     else:
-        data = requests.get(url = Tokens.BASE_URL + url, headers={'authorization':f'Bearer {Tokens.TOKEN}', 'content-type': 'application/json'})
+        data = requests.get(url = Tokens.BASE_URL + url, headers={'authorization':'Bearer ' + request.COOKIES['access'], 'content-type': 'application/json'})
     if data.status_code == 200:
         return data.json()
     if data.status_code == 401:
         url_ = Tokens.BASE_URL + reverse('token_refresh')
-        data_ = requests.post(url = url_, data = {"refresh": Tokens.REFRESH})
+        data_ = requests.post(url = url_, data = {"refresh": request.COOKIES['refresh']})
         if data_.status_code == 400:
             return redirect('login')
-        Tokens.TOKEN = data_.json()['access']
-        return send_request(url)
-
-# def get_new_token(request):
-#     url = 'http://127.0.0.1:8000/api/token/refresh/'
-#     data = requests.post(url = url, data = {"refresh": Tokens.refresh})
-#     Tokens.token = data.json()['access']
+        request.COOKIES['access'] = data_.json()['access']
+        return send_request(request, url)
                                         
