@@ -9,8 +9,6 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 # Create your views here.
 class Tokens:
-    TOKEN = ''
-    REFRESH = ''
     BASE_URL = 'http://127.0.0.1:8000'
 
 def home(request):
@@ -41,9 +39,7 @@ def login_user(request):
             data = data.json()
             user = User.objects.get(username = username)
             response = redirect('dashboard')
-            Tokens.TOKEN = data['token']['access']
             response.set_cookie('access', data['token']['access'])
-            Tokens.REFRESH = data['token']['refresh']
             response.set_cookie('refresh', data['token']['refresh'])
             login(request, user)
             messages.success(request, 'Successfully logged in')
@@ -68,9 +64,7 @@ def register_user(request):
             data = data.json()
             user = User.objects.get(username = username)
             response = redirect('dashboard')
-            Tokens.TOKEN = data['token']['access']
             response.set_cookie('access', data['token']['access'])
-            Tokens.REFRESH = data['token']['refresh']
             response.set_cookie('refresh', data['token']['refresh'])
             login(request, user)
             messages.success(request, 'Account created successfully')
