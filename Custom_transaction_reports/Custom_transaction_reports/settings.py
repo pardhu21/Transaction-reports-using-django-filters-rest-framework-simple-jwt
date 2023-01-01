@@ -136,3 +136,6 @@ REST_FRAMEWORK = {
 MESSAGE_TAGS = {
     messages.ERROR : 'danger'
 }
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
