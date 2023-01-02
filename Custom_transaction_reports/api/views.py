@@ -13,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 # Create your views here.
 
 class TransactionList(ListAPIView):
+    # Returns all transactions with filters
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
     filter_backends = [DjangoFilterBackend]
@@ -22,6 +23,7 @@ class TransactionList(ListAPIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def transacion(request, transaction_id):
+    # Returns a single transaction by taking id as a parameter
     transactions = Transaction.objects.get(pk = transaction_id)
     serializer = TransactionSerializer(transactions)
     return Response(serializer.data)
@@ -29,6 +31,7 @@ def transacion(request, transaction_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def merchant_transactions(request, merchant_id):
+    # Returns transactions related to a specific merchant taking id as parameter
     merchant = User.objects.get(pk=merchant_id)
     transacions = merchant.transaction_set.all()
     serializer = TransactionSerializer(transacions, many = True)
@@ -37,6 +40,7 @@ def merchant_transactions(request, merchant_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def customer_transactions(request, customer_id):
+    # Returns transactions of customer by taking id as a parameter
     customer = Customer.objects.get(pk=customer_id)
     transacions = customer.transaction_set.all()
     serializer = TransactionSerializer(transacions, many = True)
@@ -45,6 +49,7 @@ def customer_transactions(request, customer_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def customers(request):
+    # Returns all customers
     customers = Customer.objects.all()
     serializer = CustomerSerializer(customers, many = True)
     return Response(serializer.data)
@@ -52,6 +57,7 @@ def customers(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def customer(request, customer_id):
+    # Returns a single customer by taking in id as a parameter
     customer = Customer.objects.get(pk = customer_id)
     serializer = CustomerSerializer(customer)
     return Response(serializer.data)
@@ -59,6 +65,7 @@ def customer(request, customer_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def products(request):
+    # Returns all products
     products = Product.objects.all()
     serializer = ProductSerializer(products, many = True)
     return Response(serializer.data)
@@ -66,13 +73,15 @@ def products(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def product(request, product_id):
+    # Returns a single product detials by taking in id as a parameter
     product = Product.objects.get(pk = product_id)
     serializer = ProductSerializer(product)
     return Response(serializer.data)
 
 @api_view(['GET', 'PATCH', 'POST', 'DELETE'])
-#@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def filter(request, username):
+    # Returns filters of a user by taking in username as parameter
     if request.method == 'PATCH':
         filter = Filter.objects.get(pk = request.data['id'])
         serializer = FilterSerializer(filter, request.data)
@@ -99,6 +108,7 @@ def filter(request, username):
 
 @api_view(['GET'])
 def filter_id(request, filter_id):
+    # Returns details of a single filter by taking filter id as parameter
     filter_id = int(filter_id)
     filter = Filter.objects.get(pk = filter_id)
     serializer = FilterSerializer(filter)
@@ -106,6 +116,13 @@ def filter_id(request, filter_id):
 
 
 class RegisterAPIView(GenericAPIView):
+    """
+    This function takes in username, password,
+    email as input in json format and upon successful 
+    creation of user it returns a access token and 
+    refresh token in json format and returns a 400 
+    status repsonse if something goes wrong,
+    """
     serializer_class = RegisterSerializer
 
     def post(self, request):
@@ -128,6 +145,13 @@ class RegisterAPIView(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginAPIView(GenericAPIView):
+    """
+    This function takes in username and password as a input in
+    json format and authenticates the user and upon successful
+    authentication it returns an access token and refresh token
+    in json format and 400 status if it credentails are wrong 
+    or for any other error.
+    """
     serializer_class = LoginSerializer
 
     def post(self, request):
