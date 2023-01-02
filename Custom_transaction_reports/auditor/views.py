@@ -7,8 +7,9 @@ import requests,json
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
-# Create your views here.
+
 class Tokens:
+    # Change url here if you are running server on host other than 8000
     BASE_URL = 'http://127.0.0.1:8000'
 
 def home(request):
@@ -21,6 +22,10 @@ def register(request):
     return render(request, 'auditor/register.html')
 
 def logout_user(request):
+    """
+    On logout the access token and refresh tokens saved in 
+    will be deleted.
+    """
     logout(request)
     response = redirect('home')
     response.delete_cookie('access')
@@ -29,6 +34,11 @@ def logout_user(request):
     return response
 
 def login_user(request):
+    """
+    This function will hadle login and on successful login
+    details will be sent to api and the returned refresh token
+    and access token will be saved in cookies.
+    """
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -52,6 +62,10 @@ def login_user(request):
             return redirect('login')
         
 def register_user(request):
+    """
+    Similar to login_user function, this function will handle
+    register and set access token and refresh token in cookies.
+    """
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -88,12 +102,14 @@ def register_user(request):
 
 @login_required(login_url='login')
 def dashboard(request):
+    #This page will display recent ten transaction in a bar graph and table
     url = reverse('api:transactions')
     data = send_request(request, url)
     return render(request, 'auditor/dashboard-dashboard.html', {'data' : data[:-11:-1]})
 
 @login_required(login_url='login')
 def transactions(request):
+    # This page will show all tranactions
     url = reverse('api:transactions')
     data = send_request(request, url)
     paginator = Paginator(data, 15)
@@ -103,18 +119,25 @@ def transactions(request):
 
 @login_required(login_url='login')
 def products(request):
+    # This page will show all products
     url = reverse('api:products')
     data = send_request(request, url)
     return render(request, 'auditor/products-dashboard.html', {'products' : data})
 
 @login_required(login_url='login')
 def customers(request):
+    # This page will show all customers in a table
     url = reverse('api:customers')
     data = send_request(request, url)
     return render(request, 'auditor/customers-dashboard.html', {'customers' : data})
 
 @login_required(login_url='login')
 def filters(request):
+    """
+    HTML contains multiple forms and on posting the data
+    and the data will be to sent to api app and it will be 
+    modified or deleted or created depending on the requirement
+    """
     if request.method == 'POST':
         url = Tokens.BASE_URL + reverse('api:filter', kwargs={'username' : request.user})
         if request.POST.get('delete'):
@@ -153,30 +176,35 @@ def filters(request):
 
 @login_required(login_url='login')
 def product_volume(request):
+    # Shows a pie chart containing product volume 
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/product-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 @login_required(login_url='login')
 def product_value(request):
+    # Shows a pie chart containing product value
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/product-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 @login_required(login_url='login')
 def customer_volume(request):
+    # Shows a pie chart containing customer volume
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/customer-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 @login_required(login_url='login')
 def customer_value(request):
+    # Shows a pie chart containing customer value
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/customer-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 @login_required(login_url='login')
 def complete_report(request):
+    # Shows a complete report
     filter_url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, filter_url)
     return render(request, 'auditor/complete-report.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
@@ -184,6 +212,11 @@ def complete_report(request):
 
 @login_required(login_url='login')
 def get_product_volume(request, query):
+    """
+    This function will return a product volume JSON
+    and this function is called inside javascript to 
+    display pie chart in html page.
+    """
     transactions_url = reverse('api:transactions')
     if query == 'x':
         transactions = send_request(request, transactions_url)
@@ -201,6 +234,11 @@ def get_product_volume(request, query):
 
 @login_required(login_url='login')
 def get_product_value(request,query):
+    """
+    This function will return a product value JSON
+    and this function is called inside javascript to 
+    display pie chart in html page.
+    """
     transactions_url = reverse('api:transactions')
     if query == 'x':
         transactions = send_request(request, transactions_url)
@@ -225,6 +263,11 @@ def get_product_value(request,query):
 
 @login_required(login_url='login')
 def get_customer_volume(request, query):
+    """
+    This function will return a customer volume JSON
+    and this function is called inside javascript to 
+    display pie chart in html page.
+    """
     transactions_url = reverse('api:transactions')
     if query == 'x':
         transactions = send_request(request, transactions_url)
@@ -241,6 +284,11 @@ def get_customer_volume(request, query):
 
 @login_required(login_url='login')
 def get_customer_value(request,query):
+    """
+    This function will return a customer value JSON
+    and this function is called inside javascript to 
+    display pie chart in html page.
+    """
     transactions_url = reverse('api:transactions')
     if query == 'x':
         transactions = send_request(request, transactions_url)
@@ -257,6 +305,11 @@ def get_customer_value(request,query):
 
 @login_required(login_url='login')
 def get_transactions(request, query = None):
+    """
+    This function will return a transactions JSON
+    and this function is called inside javascript to 
+    display pie chart in html page.
+    """
     url = reverse('api:transactions')
     if query:
         transactions = send_request(request, url + '?' + query)
@@ -265,6 +318,7 @@ def get_transactions(request, query = None):
     return JsonResponse(transactions, safe=False)
 
 def get_customer_dict(request, customer_dict):
+    #Helper function to return a sorted dictoinary and called in multiple functions
     customers = send_request(request, reverse('api:customers'))
     new_dict = {}
     for i in customer_dict:
@@ -275,6 +329,14 @@ def get_customer_dict(request, customer_dict):
     return new_dict
 
 def send_request(request, url, params = None):
+    """
+    This functions sends a request to api app by taking an 
+    url as a required argument and parameters as optional argument
+    and depending on the arguments it will send a get request to
+    passed url and if the access token is expired it will send 
+    a request to refresh url and pass refresh token in header and 
+    save new access token in cookie and then recursively call itself.
+    """
     if params:
         data = requests.get(url = Tokens.BASE_URL + url, params=params, headers={'authorization':'Bearer ' + request.COOKIES['access'], 'content-type': 'application/json'})
     else:
