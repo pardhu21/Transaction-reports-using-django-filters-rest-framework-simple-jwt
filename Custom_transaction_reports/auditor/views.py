@@ -22,8 +22,11 @@ def register(request):
 
 def logout_user(request):
     logout(request)
+    response = redirect('home')
+    response.delete_cookie('access')
+    response.delete_cookie('refresh')
     messages.success(request,'Successfully logged out')
-    return redirect('home')
+    return response
 
 def login_user(request):
     if request.method == 'POST':
@@ -73,11 +76,13 @@ def register_user(request):
             messages.warning(request, 'Invalid credentials, please enter correct details')
             return redirect()
 
+@login_required(login_url='login')
 def dashboard(request):
     url = reverse('api:transactions')
     data = send_request(request, url)
     return render(request, 'auditor/dashboard-dashboard.html', {'data' : data[:-11:-1]})
 
+@login_required(login_url='login')
 def transactions(request):
     url = reverse('api:transactions')
     data = send_request(request, url)
@@ -86,16 +91,19 @@ def transactions(request):
     transactions = paginator.get_page(page_number)
     return render(request, 'auditor/transactions-dashboard.html', {'transactions' : transactions})
 
+@login_required(login_url='login')
 def products(request):
     url = reverse('api:products')
     data = send_request(request, url)
     return render(request, 'auditor/products-dashboard.html', {'products' : data})
 
+@login_required(login_url='login')
 def customers(request):
     url = reverse('api:customers')
     data = send_request(request, url)
     return render(request, 'auditor/customers-dashboard.html', {'customers' : data})
 
+@login_required(login_url='login')
 def filters(request):
     if request.method == 'POST':
         url = Tokens.BASE_URL + reverse('api:filter', kwargs={'username' : request.user})
@@ -133,32 +141,38 @@ def filters(request):
     data = send_request(request, url)
     return render(request, 'auditor/filters-dashboard.html', {'filters' : data})
 
+@login_required(login_url='login')
 def product_volume(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/product-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
+@login_required(login_url='login')
 def product_value(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/product-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
+@login_required(login_url='login')
 def customer_volume(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/customer-volume.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
+@login_required(login_url='login')
 def customer_value(request):
     url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, url)
     return render(request, 'auditor/customer-value.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
+@login_required(login_url='login')
 def complete_report(request):
     filter_url = reverse('api:filter', kwargs={'username' : request.user})
     filters = send_request(request, filter_url)
     return render(request, 'auditor/complete-report.html', {'base_url' : Tokens.BASE_URL, 'filters' : filters})
 
 
+@login_required(login_url='login')
 def get_product_volume(request, query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
@@ -175,6 +189,7 @@ def get_product_volume(request, query):
     product_volume = {k:v for k, v in sorted(product_volume.items(), key=lambda x : x[1], reverse=True)}
     return JsonResponse(product_volume, safe=False)
 
+@login_required(login_url='login')
 def get_product_value(request,query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
@@ -198,6 +213,7 @@ def get_product_value(request,query):
     product_value = {k:v for k, v in sorted(product_value.items(), key=lambda x : x[1], reverse=True)}
     return JsonResponse(product_value, safe=False)
 
+@login_required(login_url='login')
 def get_customer_volume(request, query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
@@ -213,6 +229,7 @@ def get_customer_volume(request, query):
     customer_volume = get_customer_dict(request, customer_volume)
     return JsonResponse(customer_volume, safe=False)
 
+@login_required(login_url='login')
 def get_customer_value(request,query):
     transactions_url = reverse('api:transactions')
     if query == 'x':
@@ -228,6 +245,7 @@ def get_customer_value(request,query):
     customer_value = get_customer_dict(request, customer_value)
     return JsonResponse(customer_value, safe=False)
 
+@login_required(login_url='login')
 def get_transactions(request, query = None):
     url = reverse('api:transactions')
     if query:
