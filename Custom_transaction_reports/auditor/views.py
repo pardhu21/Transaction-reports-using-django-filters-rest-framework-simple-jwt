@@ -56,13 +56,23 @@ def register_user(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
+        re_password = request.POST.get('re-password')
+        if User.objects.filter(username = username).count() != 0:
+            messages.warning(request, 'This username is already used')
+            return redirect('register')
+        if password != re_password:
+            messages.warning(request, 'Passwords do not match')
+            return redirect('register')
+        if len(password) < 8:
+            messages.warning(request, 'password is not long enough')
+            return redirect('register')
         url = reverse('api:register')
         details = {
             "username": username,
             "email": email,
             "password": password
         }
-        data = requests.post(url = url, data = details)
+        data = requests.post(url = Tokens.BASE_URL + url, data = details)
         if data.status_code == 201:
             data = data.json()
             user = User.objects.get(username = username)
@@ -74,7 +84,7 @@ def register_user(request):
             return response
         if data.status_code == 400:
             messages.warning(request, 'Invalid credentials, please enter correct details')
-            return redirect()
+            return redirect('register')
 
 @login_required(login_url='login')
 def dashboard(request):
