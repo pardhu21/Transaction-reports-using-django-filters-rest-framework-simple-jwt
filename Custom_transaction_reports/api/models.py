@@ -7,7 +7,7 @@ from django.utils import timezone
 class Product(models.Model):
     name = models.CharField(max_length=200, unique=True)
     cost = models.IntegerField()
-    category = models.CharField(max_length=50) #make it a select type field by adding few pre defined categories
+    category = models.CharField(max_length=50) 
 
     def __str__(self) -> str:
         return self.name

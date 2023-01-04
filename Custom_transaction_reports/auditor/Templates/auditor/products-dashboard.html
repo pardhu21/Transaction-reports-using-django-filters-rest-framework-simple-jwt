@@ -7,108 +7,13 @@
     <ol>
     {% for product in products %}
     <li>
-    <form action="" method="post">
-        {% csrf_token %}
     <ul class="list-group w-50 mb-1 mt-3">
         <li class="list-group-item"><div class="form-group form-inline"><label>Product Name:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="name" id="name-{{product.id}}" value="{{product.name}}" required></div></li>
         <li class="list-group-item"><div class="form-group form-inline"><label>Cost:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amount-lt" id="amount-lt-{{product.id}}" value="{{product.cost}}"></div></li>
         <li class="list-group-item"><div class="form-group form-inline"><label>Category:</label><input type="text" disabled class="form-control option{{forloop.counter}}" name="amout-gt" id="amount-gt-{{product.id}}" value="{{product.category}}"></div></li>
     </ul>
-    <button type='button' class="btn btn-primary my-3" id="button{{forloop.counter}}" onclick="edit({{forloop.counter}})">Edit</button>
-    <button type="button" class="btn btn-danger m-2" id="delete-button{{forloop.counter}}" data-bs-toggle="modal" data-bs-target="#delete-modal{{i.id}}" value="{{i.id}}" hidden>Delete</button>
-    <button type="submit" class="btn btn-info" id="submit-button{{forloop.counter}}" hidden>Save</button>
-    </form>  
-    </li>
-    <!-- Modal -->
-    <div class="modal fade" id="delete-modal{{i.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header alert-warning">
-              <h1 class="modal-title fs-5" id="modal-label{{i.id}}">Warning</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body alert-warning rounded">
-              <p>Are you sure you want to delete question <b>{{i.question}}</b>?</p>
-              <a href=""><button type="button" class="btn btn-primary float-end mx-2">Yes</button></a>
-              <button type="button" class="btn btn-secondary float-end" data-bs-dismiss="modal">Cancel</button>
-            </div>
-          </div>
-        </div>
-      </div> 
+    </li> 
     {% endfor %}
-    <li hidden id="add-question">
-        <form action="" method="post" class="form-group">
-            {% csrf_token %}
-            <ul class="list-group w-50 mb-1 mt-3">
-                <li class="list-group-item"><div class="form-group form-inline"><label>product Name:</label><input type="text" class="form-control" name="name" required placeholder="Enter a name product"></div></li>
-                <li class="list-group-item"><div class="form-group form-inline"><label>Total amount lower than:</label><input type="text" class="form-control" name="amount-lt" placeholder="Enter lower limit for total amount"></div></li>
-                <li class="list-group-item"><div class="form-group form-inline"><label>Total amount higher than:</label><input type="text" class="form-control" name="amout-gt" placeholder="Enter upper limit for total amount"></div></li>
-                <li class="list-group-item"><div class="form-group form-inline"><label>Customer name:</label><input type="text" class="form-control" name="customer-name" placeholder="Enter customer name"></div></li>
-                <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done before date:</label><input type="date" class="form-control" name="date-lt" placeholder="Enter lower limit for transaction date"></div></li>
-                <li class="list-group-item"><div class="form-group form-inline"><label>Transactions done after date:</label><input type="date" class="form-control" name="date-gt" placeholder="Enter upper limit for transaction date"></div></li>   
-            </ul>
-            <button type='button' class="btn btn-warning m-3" id="new-cancel-button" onclick="addNew()">Cancel</button>
-            <button type="submit" class="btn btn-info" id="submit-button">Save</button>
-        </form>
-    </li>
-    <button type="button" onclick="addNew()" class="btn btn-primary" id="add-new">Add new product</button>
     </div>
     </ol>
-    <script>
-        function edit(id){
-            let classname = 'option' + id;
-            options = document.getElementsByClassName(classname);
-            for(i of options){
-                i.disabled = false;
-            }
-            let submitButton = 'submit-button' + id;
-            submit = document.getElementById(submitButton);
-            submit.hidden = false;
-    
-            let deleteButton = 'delete-button' + id;
-            deleteBtn = document.getElementById(deleteButton);
-            deleteBtn.hidden = false;
-    
-            let editButton = 'button' + id;
-            editBtn = document.getElementById(editButton);
-            editBtn.className = "btn btn-warning my-3";
-            editBtn.innerHTML = "Cancel";
-            editBtn.setAttribute('onclick', 'cancelEdit(id)');
-        }
-        function cancelEdit(id){
-            id = id.slice(id.length - 1, id.length);
-            let classname = 'option' + id;
-            options = document.getElementsByClassName(classname);
-            for(i of options){
-                i.disabled = true;
-            }
-    
-            let editButton = 'button' + id;
-            editBtn = document.getElementById(editButton);
-            editBtn.className = "btn btn-primary my-3";
-            editBtn.innerHTML = "Edit";
-            editBtn.onclick = function(){ return edit(id)};
-    
-            let deleteButton = 'delete-button' + id;
-            deleteBtn = document.getElementById(deleteButton);
-            deleteBtn.setAttribute('hidden', 'hidden');
-    
-            let submitButton = 'submit-button' + id;
-            submit = document.getElementById(submitButton);
-            submit.setAttribute('hidden', 'hidden');
-    
-        }
-    
-        function addNew(){
-            var question = document.getElementById('add-question')
-            var addNewBtn = document.getElementById('add-new')
-            if (question.hidden == true){
-                question.hidden = false;
-                addNewBtn.hidden = true;
-            }else{
-                question.hidden = true;
-                addNewBtn.hidden = false;
-            }
-        }
-    </script>
 {% endblock content %}
