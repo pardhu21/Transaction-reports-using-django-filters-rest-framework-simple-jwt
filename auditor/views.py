@@ -13,7 +13,7 @@ class Tokens:
     BASE_URL = 'http://127.0.0.1:8000'
 
 def home(request):
-    return render(request, 'auditor/home.html')
+    return render(request, 'home.html')
 
 def login_page(request):
     return render(request, 'auditor/login.html')
